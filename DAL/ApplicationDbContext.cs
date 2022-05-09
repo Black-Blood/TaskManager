@@ -1,6 +1,6 @@
-﻿using System.Configuration;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using DAL.Model;
+using System.Configuration;
 
 namespace DAL;
 
@@ -17,9 +17,6 @@ public class ApplicationDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var connection = ConfigurationManager.ConnectionStrings["ApplicationDbContext"].ToString();
-        Console.WriteLine(connection);
-        optionsBuilder.UseSqlServer(connection);
+        optionsBuilder.UseSqlServer("Server=.;Database=TaskManager;Integrated Security=true");
     }
 }
-

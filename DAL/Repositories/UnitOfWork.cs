@@ -5,12 +5,12 @@ namespace DAL.Repository;
 
 public class UnitOfWork : IDisposable
 {
+    private readonly ApplicationDbContext _context = new();
     private bool _disposed = false;
-    private ApplicationDbContext _context = new();
 
-    public GenericRepository<Project> ProjectRepository { get; private set; } 
+    public Repository<Project> ProjectRepository { get; private set; } 
 
-    public GenericRepository<Assignment> AssignmentRepository { get; private set; }
+    public Repository<Assignment> AssignmentRepository { get; private set; }
 
     public UnitOfWork()
     {
@@ -23,6 +23,12 @@ public class UnitOfWork : IDisposable
         _context.SaveChanges();
     }
 
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
     protected virtual void Dispose(bool disposing)
     {
         if (!_disposed)
@@ -30,11 +36,5 @@ public class UnitOfWork : IDisposable
                 _context.Dispose();
 
         _disposed = true;
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
     }
 }

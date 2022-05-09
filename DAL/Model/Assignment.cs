@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DAL.Model;
 
@@ -7,16 +6,20 @@ namespace DAL.Model;
 public class Assignment
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public virtual Guid Id { get; set; }
-    public virtual string Title { get; set; }
-    public virtual string Description { get; set; }
-    public virtual Status Status { get; set; }
-    public virtual List<Project> Projects { get; set; } = new();
+    public int Id { get; set; }
+
+    public int ProjectId { get; set; }
+
+    public string Title { get; set; }
+
+    public string Description { get; set; }
+
+    public Status Status { get; set; }
 }
 
 public enum Status
 {
-    NotStarted,
+    Created,
     Doing,
     Finished
 }
