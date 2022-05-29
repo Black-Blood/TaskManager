@@ -1,26 +1,32 @@
 ﻿using BLL.DTO;
+using BLL.Interfaces;
 using DAL.Model;
-using DAL.Repository;
+using DAL.Repositories.Interfaces;
 
 namespace BLL;
 
-public static class AssignmentBl
+public class AssignmentBL: IAssignmentBl
 {
-    private static readonly UnitOfWork _work = new();
+    private readonly IUnitOfWork _work;
 
-    public static List<AssignmentDTO> GetAllAssignment() =>
+    public AssignmentBL(IUnitOfWork unitOfWork)
+    {
+        _work = unitOfWork;
+    }
+
+    public List<AssignmentDTO> GetAllAssignments() =>
         _work.AssignmentRepository
         .Read()
         .ToList()
-        .ConvertAll(a => DTOConverter.ToAssignmentDTO(a));
+        .ConvertAll(a => App.Mapper.Map<AssignmentDTO>(a));
 
-    public static List<AssignmentDTO> FindAssignment(string searchText) =>
+    public List<AssignmentDTO> FindAssignment(string searchText) =>
         _work.AssignmentRepository
         .Filter(a => a.Title.Contains(searchText) || a.Description.Contains(searchText))
         .ToList()
-        .ConvertAll(a => DTOConverter.ToAssignmentDTO(a));
+        .ConvertAll(a => App.Mapper.Map<AssignmentDTO>(a));
 
-    public static AssignmentDTO CreateAssignment(string title, string description, int projectId)
+    public AssignmentDTO CreateAssignment(string title, string description, int projectId)
     {
         Assignment assignment = new()
         {
@@ -33,15 +39,15 @@ public static class AssignmentBl
         _work.AssignmentRepository.Create(assignment);
         _work.Save();
 
-        return DTOConverter.ToAssignmentDTO(assignment);
+        return App.Mapper.Map<AssignmentDTO>(assignment);
     }
 
-    public static AssignmentDTO UpdateAssignment(int id, string title, string description, string status)
+    public AssignmentDTO UpdateAssignment(int id, string title, string description, string status)
     {
         Assignment? assignment = _work.AssignmentRepository.Find(a => a.Id == id);
 
         if (assignment is null)
-            throw new Exception();
+            throw new ArgumentException();
 
         assignment.Title = title;
         assignment.Description = description;
@@ -50,10 +56,10 @@ public static class AssignmentBl
         _work.AssignmentRepository.Update(assignment);
         _work.Save();
 
-        return DTOConverter.ToAssignmentDTO(assignment);
+        return App.Mapper.Map<AssignmentDTO>(assignment);
     }
 
-    public static bool DeleteAssignment(int assignmentId)
+    public bool DeleteAssignment(int assignmentId)
     {
         Assignment? assignment = _work.AssignmentRepository.Find(a => a.Id == assignmentId);
 
@@ -66,5 +72,5 @@ public static class AssignmentBl
         return true;
     }
 
-    public static string[] GetPossibleStatuses() => Enum.GetNames(typeof(Status));
+    public string[] GetPossibleStatuses() => Enum.GetNames(typeof(Status));
 }

@@ -1,26 +1,33 @@
 ﻿using BLL.DTO;
+using BLL.Interfaces;
 using DAL.Model;
+using DAL.Repositories.Interfaces;
 using DAL.Repository;
 
 namespace BLL;
 
-public static class ProjectBL
+public class ProjectBL: IProjectBl
 {
-    private static readonly UnitOfWork _work = new();
+    private readonly IUnitOfWork _work;
 
-    public static List<ProjectDTO> GetAllProjects() =>
+    public ProjectBL(IUnitOfWork unitOfWork)
+    {
+        _work = unitOfWork;
+    }
+
+    public List<ProjectDTO> GetAllProjects() =>
         _work.ProjectRepository
         .Read()
         .ToList()
-        .ConvertAll(p => DTOConverter.ToProjectDTO(p));
+        .ConvertAll(p => App.Mapper.Map<ProjectDTO>(p));
 
-    public static List<ProjectDTO> FindProject(string searchText) =>
+    public List<ProjectDTO> FindProject(string searchText) =>
         _work.ProjectRepository
         .Filter(p => p.Title.Contains(searchText) || p.Description.Contains(searchText))
         .ToList()
-        .ConvertAll(p => DTOConverter.ToProjectDTO(p));
+        .ConvertAll(p => App.Mapper.Map<ProjectDTO>(p));
 
-    public static ProjectDTO CreateProject(string title, string description)
+    public ProjectDTO CreateProject(string title, string description)
     {
         Project project = new()
         {
@@ -31,15 +38,15 @@ public static class ProjectBL
         _work.ProjectRepository.Create(project);
         _work.Save();
 
-        return DTOConverter.ToProjectDTO(project);
+        return App.Mapper.Map<ProjectDTO>(project);
     }
 
-    public static ProjectDTO UpdateProject(int projectId, string title, string description)
+    public ProjectDTO UpdateProject(int projectId, string title, string description)
     {
         Project? project = _work.ProjectRepository.Find(p => p.Id == projectId);
 
         if (project is null)
-            throw new Exception();
+            throw new ArgumentException();
 
         project.Title = title;
         project.Description = description;
@@ -47,10 +54,10 @@ public static class ProjectBL
         _work.ProjectRepository.Update(project);
         _work.Save();
 
-        return DTOConverter.ToProjectDTO(project);
+        return App.Mapper.Map<ProjectDTO>(project);
     }
 
-    public static bool DeleteProject(int projectId)
+    public bool DeleteProject(int projectId)
     {
         Project? project = _work.ProjectRepository.Find(p => p.Id == projectId);
 
