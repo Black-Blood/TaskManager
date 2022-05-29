@@ -1,5 +1,6 @@
 using BLL;
 using BLL.DTO;
+using BLL.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TaskManager.Controllers;
@@ -8,25 +9,27 @@ namespace TaskManager.Controllers;
 [Route("[controller]")]
 public class AssignmentsController : ControllerBase
 {
+    private readonly IAssignmentBl _service = ServiceLocator.GetService<IAssignmentBl>();
+
     [Route("[action]")]
     [HttpPut]
-    public AssignmentDTO Create(AssignmentCreatingBody body) => AssignmentBl.CreateAssignment(body.Title, body.Description, body.ProjectId);
+    public AssignmentDTO Create(AssignmentCreatingBody body) => _service.CreateAssignment(body.Title, body.Description, body.ProjectId);
 
     [Route("[action]")]
     [HttpGet]
-    public IEnumerable<AssignmentDTO> Read() => AssignmentBl.GetAllAssignment();
+    public IEnumerable<AssignmentDTO> Read() => _service.GetAllAssignments();
 
     [Route("[action]")]
     [HttpGet]
-    public IEnumerable<string> GetPossibleStatuses() => AssignmentBl.GetPossibleStatuses();
+    public IEnumerable<string> GetPossibleStatuses() => _service.GetPossibleStatuses();
 
     [Route("[action]")]
     [HttpPatch]
-    public AssignmentDTO Update(AssignmentUpdatingBody body) => AssignmentBl.UpdateAssignment(body.Id, body.Title, body.Description, body.Status);
+    public AssignmentDTO Update(AssignmentUpdatingBody body) => _service.UpdateAssignment(body.Id, body.Title, body.Description, body.Status);
 
     [Route("[action]")]
     [HttpDelete]
-    public bool Delete(AssignmentDeletingBody body) => ProjectBL.DeleteProject(body.Id);
+    public bool Delete(AssignmentDeletingBody body) => _service.DeleteAssignment(body.Id);
 
 
 }

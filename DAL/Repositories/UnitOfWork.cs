@@ -1,21 +1,21 @@
 ﻿using DAL.Model;
-
+using DAL.Repositories.Interfaces;
 
 namespace DAL.Repository;
 
-public class UnitOfWork : IDisposable
+public class UnitOfWork : IDisposable, IUnitOfWork
 {
     private readonly ApplicationDbContext _context = new();
     private bool _disposed = false;
 
-    public Repository<Project> ProjectRepository { get; private set; } 
+    public IRepository<Project> ProjectRepository { get; set; } 
 
-    public Repository<Assignment> AssignmentRepository { get; private set; }
+    public IRepository<Assignment> AssignmentRepository { get; set; }
 
     public UnitOfWork()
     {
-        ProjectRepository = new(_context);
-        AssignmentRepository = new(_context);
+        ProjectRepository = new Repository<Project>(_context);
+        AssignmentRepository = new Repository<Assignment>(_context);
     }
 
     public void Save()

@@ -1,6 +1,6 @@
 ﻿namespace DAL.Repository;
 
-internal interface IRepository<TEntity> where TEntity : class
+public interface IRepository<TEntity> where TEntity : class
 {
     public IQueryable<TEntity> Filter(Func<TEntity, bool> predicate);
     
